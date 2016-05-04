@@ -1,0 +1,15 @@
+---
+- name: Install Mesos-DNS - Download binary
+  get_url: >
+    url=https://github.com/mesosphere/mesos-dns/releases/download/v0.5.2/mesos-dns-v0.5.2-linux-amd64 
+    dest=/usr/local/bin/mesos-dns 
+    checksum=md5:c331538f860f18dbfe3a067fa4850bff
+    mode=755
+- name: Install Mesos-DNS - Create configuration directory
+  file: path=/etc/mesos-dns/ state=directory mode=755
+- name: Install Mesos-DNS - Add configuration file
+  template: >
+    src=mesos-dns.config.json.j2 
+    dest=/etc/mesos-dns/config.json 
+    mode=644
+

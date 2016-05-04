@@ -1,0 +1,61 @@
+---
+- name: Check if HAProxy has been installed
+  stat: path=/etc/init.d/haproxy
+  register: haproxy_initd_file
+- name: Stop HAproxy to free allocated ports
+  service: name="{{item}}" state=stopped
+  with_items:
+    - haproxy
+  when: haproxy_initd_file.stat.exists
+- name: Marathon-lb - fetch Github repository
+  git: repo=https://github.com/mesosphere/marathon-lb.git dest=/marathon-lb
+- name: Marathon-lb - Install HAproxy build requirements
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - python3 
+    - python3-pip 
+    - openssl 
+    - libssl-dev 
+    - runit 
+    - procps
+    - wget 
+    - build-essential 
+    - libpcre3 
+    - libpcre3-dev 
+    - python3-dateutil 
+    - socat 
+    - iptables 
+    - libreadline-dev
+- name: Marathon-lb - Create HAproxy directories
+  file: >
+    path={{item}}
+    state=directory
+    mode=755
+  with_items:
+    - '/var/state/haproxy'
+    - '/var/run/haproxy'
+- name: Marathon-lb - Install Python requirements
+  pip: executable=pip3 requirements=/marathon-lb/requirements.txt
+- name: Marathon-lb - Install HAproxy
+  apt: name=haproxy state=latest
+- name: Marathon-lb - Build latest HAproxy (1.6+)
+  shell: ./build-haproxy.sh
+  args:
+    chdir: /marathon-lb
+    creates: /usr/local/sbin/haproxy
+- name: Marathon-lb - Generate SSL certificate
+  shell: '{{item}}'
+  with_items:
+    - 'openssl genrsa -out /tmp/server-key.pem 2048'
+    - 'openssl req -new -key /tmp/server-key.pem -out /tmp/server-csr.pem -subj /CN=*/'
+    - 'openssl x509 -req -in /tmp/server-csr.pem -out /tmp/server-cert.pem -signkey /tmp/server-key.pem -days 3650'
+    - 'cat /tmp/server-cert.pem /tmp/server-key.pem > /etc/ssl/mesosphere.com.pem'
+    - 'rm /tmp/server-*.pem'
+- name: Marathon-lb - Add HAproxy default variables
+  template: src=./etc.default.haproxy.j2 dest=/etc/default/haproxy backup=yes
+- name: Restart HAproxy
+  service: name="{{item}}" state=restarted
+  with_items:
+    - haproxy
+  ignore_errors: true
+
