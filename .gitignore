@@ -60,3 +60,24 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# Project extras
+logs/**
+Vagrantfile
+project/template_api/static/*
+project/template_api/cache/*
+project/template_api/template_api/mysql-dns.json
+vagrant_ansible_*
+
+# Private files
+.vagrant/*
+.ssh/*
+
+# Virtual environment
+env
+
+# IDEs
+.idea
+
+# Ansible
+*.retry
