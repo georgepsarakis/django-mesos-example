@@ -1,0 +1,70 @@
+---
+- name: Delete Marathon tasks
+  uri: 
+    url: "{{ marathon_api_base_url ~ '/apps/' ~ ((item|from_json).id) ~ '/?force=true' }}"
+    method: DELETE
+    HEADER_Content-type: "application/json"
+    status_code: 200
+  ignore_errors: true
+  with_file: marathon_task_files
+- name: Build application Docker image
+  docker_image: path=/vagrant name=local_templater state=present tag=alpha
+- name: Stop all running containers
+  shell: docker rm -f $(docker ps -aq)
+  ignore_errors: true
+- name: Retrieve Marathon apps
+  uri:
+    url: "{{ marathon_api_base_url ~ '/apps' }}"
+    status_code: 200
+  register: marathon_current_app_list_response
+- set_fact:
+    marathon_installed_apps: "{{ marathon_current_app_list_response.json.apps|map(attribute='id')|list }}"
+- name: Submit Marathon tasks (1/2)
+  uri: 
+    url: "{{marathon_api_base_url ~ '/apps/?force=true'}}"
+    method: POST
+    HEADER_Content-type: "application/json"
+    body: "{{item}}"
+    body_format: json
+    status_code: 200,201
+  with_file: "{{marathon_task_files[:3]}}"
+  when: "{{'/' ~ ((item|from_json).id) not in marathon_installed_apps}}"
+- name: Wait for ports to become available (HAProxy, Mesos-DNS, Mysql)
+  wait_for: >
+    port={{item}}
+    timeout=600
+  with_items:
+    - 8123
+    - 80
+    - 3306
+- name: Get MySQL host IP from Mesos-DNS
+  get_url: >    
+    url="http://localhost:8123/v1/services/_mysql-db._tcp.marathon.mesos."
+    dest=/vagrant/template_api/template_api/mysql-dns.json
+- name: "[Django] DB migrate & Collect static files"
+  docker:
+    detach: false
+    image: 'local_templater:alpha'
+    command: '/usr/bin/python manage.py {{item}} --no-input'
+    volumes:
+      - '/vagrant:/app/web'
+  with_items:
+    - collectstatic
+    - migrate
+- name: Submit Marathon tasks (2/2)
+  uri: 
+    url: "{{marathon_api_base_url ~ '/apps/?force=true'}}"
+    method: POST
+    HEADER_Content-type: "application/json"
+    body: "{{item}}"
+    body_format: json
+    status_code: 200,201
+  with_file: "{{marathon_task_files[3:]}}"
+  when: "{{'/' ~ ((item|from_json).id) not in marathon_installed_apps}}"
+- name: Wait for ports to become available (Nginx)
+  wait_for: >
+    port={{item}}
+    timeout=600
+  with_items:
+    - 7070
+
