@@ -1,0 +1,13 @@
+---
+- name: "Install zookeeper"
+  apt: name="{{item}}" state=present update_cache=yes
+  with_items:
+    - zookeeper
+    - zookeeperd
+- name: "[Zookeeper] Configuration (1/3)"
+  lineinfile: line=1 dest=/etc/zookeeper/conf/myid state=present create=yes
+- name: "[Zookeeper] Configuration (2/3)"
+  template: src=zookeeper.cfg.j2 dest=/etc/zookeeper/conf/zoo.cfg
+- name: "[Zookeeper] Configuration (3/3)"
+  lineinfile: line="server.1=0.0.0.0:2888:3888" dest=/etc/zookeeper/conf/zoo.cfg state=present
+

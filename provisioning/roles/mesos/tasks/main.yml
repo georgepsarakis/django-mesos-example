@@ -1,0 +1,22 @@
+---
+- name: "Install Mesos"
+  apt: name="{{item}}" state=present update_cache=yes
+  with_items:
+    - mesos
+- name: "Configure containerizers"
+  lineinfile: line="docker,mesos" dest=/etc/mesos-slave/containerizers state=present create=yes
+- name: "Configure Zookeeper"
+  shell: "echo 'zk://localhost:2181/mesos' > /etc/mesos/zk"
+- name: Restart Zookeeper and Mesos
+  service: name="{{item}}" state=restarted
+  with_items:
+    - zookeeper
+    - mesos-master
+    - mesos-slave
+- wait_for: >
+    port={{item}}
+    delay=2
+  with_items:
+    - 5050
+    - 2181
+
