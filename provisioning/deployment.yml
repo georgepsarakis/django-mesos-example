@@ -1,0 +1,14 @@
+---
+- hosts: all
+  roles:
+    - common
+    - system
+    - zookeeper
+    - mesos
+    - marathon
+    - mesos-dns
+    - marathon-lb
+    - mysql
+    - nginx
+    - application
+    - checks
