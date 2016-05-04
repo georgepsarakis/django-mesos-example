@@ -1,0 +1,15 @@
+---    
+- name: "[Mesosphere] Add Mesosphere APT key"
+  apt_key: keyserver=keyserver.ubuntu.com id=E56151BF state=present
+- name: "[OS] Get distribution info"
+  shell: "lsb_release -is | tr '[:upper:]' '[:lower:]'"
+  register: distribution
+- name: "[OS] Get LSB release"
+  shell: "lsb_release -cs"
+  register: codename
+- name: "[Mesosphere] Add APT repository"
+  apt_repository: >
+    repo="deb http://repos.mesosphere.com/{{ distribution.stdout }} {{ codename.stdout }} main"
+    state=present 
+    update_cache=yes
+
