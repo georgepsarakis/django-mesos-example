@@ -1,0 +1,6 @@
+---
+- name: Pull MySQL Docker image
+  shell: docker pull mysql:latest
+- name: Create MySQL data directory
+  file: path=/var/lib/mysql state=directory mode=755
+
