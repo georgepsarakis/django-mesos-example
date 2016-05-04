@@ -1,0 +1,53 @@
+#!/bin/bash
+set -e
+
+TASK=$1
+
+function enable_virtual_env {
+    echo "EXECUTING : virtualenv with Ansible"
+
+    virtualenv env
+    source env/bin/activate
+    pip install -U ansible
+}
+
+function deploy {
+    enable_virtual_env
+    echo "EXECUTING : initialization & deployment"
+    ansible-playbook -i localhost, -c local provisioning/bootstrap.yml
+}
+
+function destroy {
+    echo "EXECUTING : destroy"
+    vagrant destroy
+}
+
+function halt {
+    echo "EXECUTING : halt"
+    vagrant halt
+}
+
+function logs {
+    echo "EXECUTING : logs"
+    tail -F logs/*
+}
+
+function usage {
+    echo 'Valid tasks are: [halt,logs,deploy,destroy,recreate]'
+    exit 1
+}
+
+if [ "$TASK" == "deploy" ]; then
+    deploy
+elif [ "$TASK" == "destroy" ]; then
+    destroy
+elif [ "$TASK" == "recreate" ]; then
+    destroy
+    deploy
+elif [ "$TASK" == "logs" ]; then
+    logs
+elif [ "$TASK" == "halt" ]; then
+    halt
+else
+    usage
+fi
