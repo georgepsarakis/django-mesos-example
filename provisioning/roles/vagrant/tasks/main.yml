@@ -1,0 +1,24 @@
+- debug: var=vagrant_base_dir
+- name: Create Vagrantfile
+  template: src=./templates/Vagrantfile.j2 dest=./Vagrantfile backup=no
+- name: Get Vagrant status
+  shell: >
+    vagrant status | grep "{{vagrant_vm_name}}" || true
+  register: cmd_output
+- debug: msg="{{cmd_output.stdout}}"
+- set_fact:
+    vagrant_vm_status: "{{cmd_output.stdout|vagrant_status}}"
+- name: Create log directory
+  file: path="{{log_path|dirname}}" state=directory
+- name: Cleanup logs
+  file: path="{{item}}" state=absent
+  with_items:
+    - "{{log_path}}"
+    - "{{error_log_path}}"
+- name: Create/start VM
+  shell: "vagrant up --no-provision > {{ log_path }} 2>{{ error_log_path }}"
+  when: "{{vagrant_vm_status.status != 'running'}}"
+  tags: start_vm
+- name: Provision VM
+  shell: "vagrant provision > {{log_path}} 2>{{error_log_path}}"
+  tags: provision_vm

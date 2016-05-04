@@ -1,0 +1,21 @@
+vagrant_base_dir: "{{ (role_path ~ '/../../..')|os_path_abspath }}"
+vagrant_base_box: local_trusty64_vagrant_ready
+vagrant_forwarded_ports:
+  - {'guest': 7070, 'host': 7070}
+  - {'guest': 8080, 'host': 8080}
+  - {'guest': 9090, 'host': 9090}
+  - {'guest': 9000, 'host': 9000}
+  - {'guest': 10000, 'host': 10000}
+  - {'guest': 11000, 'host': 11000}
+  - {'guest': 10001, 'host': 10001}
+  - {'guest': 5050, 'host': 5050}
+vagrant_vm_name: django-mesos-example
+vagrant_vm_memory: 1024
+vagrant_synced_folders:
+  - {"local": "./project", "vm": "/vagrant"}
+vagrant_ansible_raw_arguments: 
+  - "-vvvv"
+vagrant_private_network_ip: "192.168.33.10"
+log_path: logs/bootstrap.log
+error_log_path: logs/bootstrap.err
+
