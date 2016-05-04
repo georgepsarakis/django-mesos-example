@@ -1,0 +1,52 @@
+---
+- name: Add hosts file
+  template: >
+    src=./templates/etc.hosts.j2 
+    dest=/etc/hosts 
+    mode=644
+- name: Install additional APT packages
+  apt: name={{item}} state=present 
+  with_items:
+    - apt-transport-https 
+    - ca-certificates
+    - apparmor
+    - python-software-properties
+    - python-pip
+    - python-virtualenv
+    - python-httplib2
+- name: Install Python system packages
+  pip: name={{item}}
+  with_items:
+    - "docker-py"
+- name: "Get kernel version"
+  shell: uname -r
+  register: uname_r
+- name: "Install linux-image-extra-{{uname_r.stdout}}"
+  apt: name="linux-image-extra-{{uname_r.stdout}}" state=present
+- name: "Install Docker - add apt key"
+  apt_key: >
+    keyserver=p80.pool.sks-keyservers.net 
+    id=58118E89F3A912897C070ADBF76221572C52609D
+- name: "Install Docker - add repository"
+  apt_repository: > 
+    repo="deb https://apt.dockerproject.org/repo ubuntu-trusty main"
+    state=present
+    update_cache=yes
+- name: "Install Docker - install docker-engine"
+  apt: name=docker-engine state=present
+- name: "Accept Java 8 License"
+  debconf: >
+    name='oracle-java8-installer' 
+    question='shared/accepted-oracle-license-v1-1' 
+    value='true' 
+    vtype='select'
+- name: "Add Java8 apt repository"
+  apt_repository: repo='ppa:webupd8team/java' state=present update_cache=yes
+- name: "Install Java8"
+  apt: name="{{item}}" state=present update_cache=yes
+  with_items:
+    - oracle-java8-installer
+    - oracle-java8-set-default
+- name: "Full Upgrade OS"
+  apt: update_cache=yes upgrade=full
+
