@@ -1,0 +1,36 @@
+{
+  "id": "mysql-db",
+  "cpus": 0.1,
+  "mem": 200,
+  "instances": 1,
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "mysql:5.7",
+      "parameters": [
+          {"key": "env", "value": "MYSQL_ROOT_PASSWORD=test"},
+          {"key": "env", "value": "MYSQL_USER=template_api"},
+          {"key": "env", "value": "MYSQL_PASSWORD=template_api_test"},
+          {"key": "env", "value": "MYSQL_DATABASE=template_api"}
+      ],
+      "network": "BRIDGE",
+      "portMappings": [
+          {"containerPort": 3306, "hostPort": 0, "servicePort": 3306, "protocol": "tcp" }
+      ]  
+    },
+    "volumes": [{
+        "containerPath": "/var/lib/mysql",
+        "hostPath": "/var/lib/mysql",
+        "mode": "RW"
+    }]
+  },
+  "healthChecks": [
+    {
+      "protocol": "TCP",
+      "portIndex": 0,
+      "gracePeriodSeconds": 5,
+      "intervalSeconds": 20,
+      "maxConsecutiveFailures": 3
+    }
+  ]
+}

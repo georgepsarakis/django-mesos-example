@@ -1,0 +1,8 @@
+{
+    "cmd": "sudo python3 /marathon-lb/marathon_lb.py -H --sse --syslog-socket /dev/null --haproxy-config /etc/haproxy/haproxy.cfg --marathon http://localhost:8080 --group '*' -c '/etc/init.d/haproxy restart'",
+    "cpus": 0.1,
+    "mem": 32,
+    "id": "marathon-lb",
+    "instances": 1
+}
+

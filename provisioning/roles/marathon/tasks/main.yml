@@ -1,0 +1,28 @@
+---
+- name: "Install Marathon"
+  apt: name="{{item}}" state=present update_cache=yes
+  with_items:
+    - marathon
+- name: Delete Marathon tasks
+  uri: 
+    url: "{{ marathon_api_base_url ~ '/apps/' ~ ((item|from_json).id) ~ '/?force=true' }}"
+    method: DELETE
+    HEADER_Content-type: "application/json"
+    status_code: 200
+  ignore_errors: true
+  with_file: marathon_task_files
+- name: Restart Zookeeper, Mesos (master), Marathon
+  service: name="{{item}}" state=restarted
+  with_items:
+    - zookeeper
+    - mesos-master
+    - marathon
+    - mesos-slave
+- wait_for: >
+    port={{item}}
+    delay=2
+  with_items:
+    - 5050
+    - 8080
+    - 2181
+

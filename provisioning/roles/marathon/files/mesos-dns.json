@@ -1,0 +1,8 @@
+{
+    "cmd": "sudo /usr/local/bin/mesos-dns -config=/etc/mesos-dns/config.json",
+    "cpus": 0.10,
+    "mem": 32,
+    "id": "mesos-dns",
+    "instances": 1
+}
+

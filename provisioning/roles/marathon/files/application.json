@@ -1,0 +1,30 @@
+{
+  "id": "templater",
+  "cpus": 0.1,
+  "mem": 64,
+  "instances": 2,
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "local_templater:alpha",
+      "network": "BRIDGE",
+      "portMappings": [
+          {"containerPort": 45000, "hostPort": 0, "servicePort": 45000, "protocol": "tcp" }
+      ]
+    },
+    "volumes": [{
+        "containerPath": "/app/web",
+        "hostPath": "/vagrant",
+        "mode": "RW"
+    }]
+  },
+  "healthChecks": [
+    {
+      "protocol": "TCP",
+      "portIndex": 0,
+      "gracePeriodSeconds": 5,
+      "intervalSeconds": 20,
+      "maxConsecutiveFailures": 3
+    }
+  ]
+}

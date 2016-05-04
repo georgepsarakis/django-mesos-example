@@ -1,0 +1,8 @@
+marathon_api_base_url: "http://localhost:8080/v2"
+marathon_task_files:
+  - "files/mesos-dns.json"
+  - "files/mysql.json"
+  - "files/marathon-lb.json"
+  - "files/application.json"
+  - "files/nginx.json"
+

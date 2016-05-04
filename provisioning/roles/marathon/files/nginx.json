@@ -1,0 +1,30 @@
+{
+  "id": "nginx",
+  "cpus": 0.1,
+  "mem": 32,
+  "instances": 1,
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "local_nginx:alpha",
+      "network": "BRIDGE",
+      "portMappings": [
+          {"containerPort": 7070, "hostPort": 0, "servicePort": 7070, "protocol": "tcp" }
+      ]  
+    },
+    "volumes": [{
+        "containerPath": "/static",
+        "hostPath": "/vagrant/template_api/static",
+        "mode": "RO"
+    }]
+  },
+  "healthChecks": [
+    {
+      "protocol": "HTTP",
+      "portIndex": 0,
+      "gracePeriodSeconds": 5,
+      "intervalSeconds": 20,
+      "maxConsecutiveFailures": 3
+    }
+  ]
+}
