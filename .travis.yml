@@ -4,5 +4,7 @@ services:
   - docker
 language: python
 install:
-  - apt-get install -y libffi-dev build-essential python-dev
+  - sudo apt-get install -y libffi-dev build-essential python-dev
   - pip install ansible
+script:
+  - sudo ansible-playbook -i localhost, -c local provisioning/deployment.yml
