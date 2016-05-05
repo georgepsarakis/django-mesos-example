@@ -49,4 +49,5 @@
     - oracle-java8-set-default
 - name: "Full Upgrade OS"
   apt: update_cache=yes upgrade=full
+  when: not (system_skip_full_upgrade|bool)
 
