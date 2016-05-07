@@ -17,3 +17,6 @@ script:
   - sudo netstat -tulpane
   - sudo ps uxa
   - cat /var/log/mesos/*
+  - sudo cat /etc/nsswitch.conf
+  - sudo cat /etc/resolv.conf
+  - sudo cat /etc/network/interfaces
