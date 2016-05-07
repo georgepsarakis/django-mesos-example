@@ -8,6 +8,9 @@ install:
   - sudo pip install ansible
   - sudo ifconfig
 script:
+  - sudo cat /etc/hosts
+  - sudo hostname
+  - exit 1
   - sudo ln -s `pwd`/project /vagrant
   - sudo -E ansible-playbook -vvv -i localhost, -c local -e "system_skip_full_upgrade=yes system_skip_network_configuration=yes" provisioning/deployment.yml || true
   - sudo netstat -tulpane
