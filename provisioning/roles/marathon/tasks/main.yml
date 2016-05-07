@@ -18,8 +18,10 @@
     - mesos-master
     - marathon
     - mesos-slave
-- wait_for: >
+- name: "Wait for ports to become available (Zookeeper, Mesos, Marathon)"
+  wait_for: >
     port={{item}}
+    host={{ansible_default_ipv4.address}}
     delay=2
   with_items:
     - 5050
