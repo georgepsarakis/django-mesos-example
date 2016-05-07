@@ -9,6 +9,7 @@
   lineinfile: >
     line={{ansible_default_ipv4.address}}
     create=yes
+    dest={{item}}
   with_items:
     - /etc/mesos-master/ip
     - /etc/mesos-slave/ip
@@ -16,6 +17,7 @@
   lineinfile: >
     line={{ansible_hostname}}
     create=yes
+    dest={{item}}
   with_items:
     - /etc/mesos-master/hostname
     - /etc/mesos-slave/hostname
