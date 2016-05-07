@@ -32,7 +32,7 @@
 - name: Wait for ports to become available (HAProxy, Mesos-DNS, Mysql)
   wait_for: >
     port={{item}}
-    timeout=600
+    timeout=300
   with_items:
     - 8123
     - 80
