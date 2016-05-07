@@ -1,9 +1,10 @@
 ---
-- name: Add hosts file
-  template: >
-    src=./templates/etc.hosts.j2 
-    dest=/etc/hosts 
-    mode=644
+- name: Add hostname/FQDN entries in /etc/hosts file
+  lineinfile: >
+    dest=/etc/hosts
+    line={{item}}
+  with_items:
+    - "{{ansible_default_ipv4.address}}    {{ansible_fqdn}}    {{ansible_hostname}}"
   when: not (system_skip_network_configuration|bool)
 - name: Install additional APT packages
   apt: name={{item}} state=present 
