@@ -9,8 +9,7 @@ install:
   - sudo ifconfig
 script:
   - sudo ln -s `pwd`/project /vagrant
-  - sudo -E ansible-playbook -vvv -i localhost, -c local -e "system_skip_full_upgrade=yes system_skip_network_configuration=yes" provisioning/deployment.yml
-after_failure:
-  - netstat -tulpane
-  - ps uxa
-  - ls -la /var/log/mesos/*
+  - sudo -E ansible-playbook -vvv -i localhost, -c local -e "system_skip_full_upgrade=yes system_skip_network_configuration=yes" provisioning/deployment.yml || true
+  - sudo netstat -tulpane
+  - sudo ps uxa
+  - cat /var/log/mesos/*
