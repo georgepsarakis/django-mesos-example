@@ -31,6 +31,7 @@
     - mesos-slave
 - wait_for: >
     port={{item}}
+    host={{ansible_default_ipv4.address}}
     delay=2
   with_items:
     - 5050
