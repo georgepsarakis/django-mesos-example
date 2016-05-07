@@ -5,6 +5,20 @@
     - mesos
 - name: "Configure containerizers"
   lineinfile: line="docker,mesos" dest=/etc/mesos-slave/containerizers state=present create=yes
+- name: "Configure networking (IP)"
+  lineinfile: >
+    line={{ansible_default_ipv4.address}}
+    create=yes
+  with_items:
+    - /etc/mesos-master/ip
+    - /etc/mesos-slave/ip
+- name: "Configure networking (hostname)"
+  lineinfile: >
+    line={{ansible_hostname}}
+    create=yes
+  with_items:
+    - /etc/mesos-master/hostname
+    - /etc/mesos-slave/hostname
 - name: "Configure Zookeeper"
   shell: "echo 'zk://localhost:2181/mesos' > /etc/mesos/zk"
 - name: Restart Zookeeper and Mesos
