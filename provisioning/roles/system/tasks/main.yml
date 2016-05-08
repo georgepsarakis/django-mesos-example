@@ -16,6 +16,7 @@
     - python-pip
     - python-virtualenv
     - python-httplib2
+    - python-mysqldb
 - name: Install Python system packages
   pip: name={{item}}
   with_items:

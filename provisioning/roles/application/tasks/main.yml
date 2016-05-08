@@ -45,6 +45,16 @@
   until: (response.content|from_json).0.ip != ""
   retries: 6
   delay: 10
+- name: Check that MySQL is accepting connections
+  mysql_variables: >
+    login_host={{ansible_default_ipv4.address}}
+    login_user=root
+    login_password=test
+    variable=version
+  register: result
+  until: result|success
+  retries: 6
+  delay: 10 
 - name: Get MySQL host IP from Mesos-DNS
   get_url: >    
     url="http://localhost:8123/v1/services/_mysql-db._tcp.marathon.mesos."
