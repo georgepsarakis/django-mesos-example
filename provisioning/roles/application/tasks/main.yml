@@ -42,8 +42,8 @@
     url="http://localhost:8123/v1/services/_mysql-db._tcp.marathon.mesos."
     return_content=yes
   register: response
-  until: (response.content|from_json).0.ip != ""
-  retries: 6
+  until: response.json.0.ip != ""
+  retries: 10
   delay: 10
 - name: Check that MySQL is accepting connections
   mysql_variables: >
@@ -82,7 +82,7 @@
 - name: Wait for ports to become available (Nginx)
   wait_for: >
     port={{item}}
-    timeout=600
+    timeout=300
   with_items:
     - 7070
 

@@ -1,6 +1,6 @@
 # the upstream component nginx needs to connect to
 upstream django {
-    server 192.168.33.10:45000;
+    server {{ansible_default_ipv4.address}}:45000;
 }
 
 # configuration of the server
