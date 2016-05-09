@@ -1,9 +1,9 @@
 - name: "Verify Installation (1/2)"
   shell: 'mesos-resolve `cat /etc/mesos/zk`'
-  register: master_socket
-  until: "{{master_socket|success}}" 
+  register: var_mesos_master_socket
+  until: "{{var_mesos_master_socket|success}}" 
   retries: 5
   delay: 5
 - name: "Verify Installation (2/2)"
-  shell: 'mesos-execute --master={{master_socket.stdout}} --name="cluster-test" --command="sleep 5" --resources=cpus:0.01'
+  shell: 'mesos-execute --master={{var_mesos_master_socket.stdout}} --name="cluster-test" --command="sleep 5" --resources=cpus:0.01'
 

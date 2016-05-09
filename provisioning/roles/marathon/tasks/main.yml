@@ -3,6 +3,7 @@
   apt: name="{{item}}" state=present update_cache=yes
   with_items:
     - marathon
+  register: var_marathon_installation
 - name: Delete Marathon tasks
   uri: 
     url: "{{ marathon_api_base_url ~ '/apps/' ~ ((item|from_json).id) ~ '/?force=true' }}"
@@ -11,13 +12,14 @@
     status_code: 200
   ignore_errors: true
   with_file: marathon_task_files
-- name: Restart Zookeeper, Mesos (master), Marathon
-  service: name="{{item}}" state=restarted
+- name: Reload Zookeeper, Mesos, Marathon
+  service: name="{{item}}" state=reloaded
   with_items:
     - zookeeper
     - mesos-master
     - marathon
     - mesos-slave
+  when: not var_marathon_installation|skipped
 - name: "Wait for ports to become available (Zookeeper, Mesos, Marathon)"
   wait_for: >
     port={{item}}

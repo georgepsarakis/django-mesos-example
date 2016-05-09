@@ -17,9 +17,9 @@
   uri:
     url: "{{ marathon_api_base_url ~ '/apps' }}"
     status_code: 200
-  register: marathon_current_app_list_response
+  register: var_marathon_current_app_list_response
 - set_fact:
-    marathon_installed_apps: "{{ marathon_current_app_list_response.json.apps|map(attribute='id')|list }}"
+    marathon_installed_apps: "{{ var_marathon_current_app_list_response.json.apps|map(attribute='id')|list }}"
 - name: Submit Marathon tasks (Mesos-DNS, Marathon-lb, MySQL)
   uri: 
     url: "{{marathon_api_base_url ~ '/apps/?force=true'}}"
@@ -42,8 +42,8 @@
   uri: >
     url="http://localhost:8123/v1/services/_mysql-db._tcp.marathon.mesos."
     return_content=yes
-  register: response
-  until: response.json.0.ip != ""
+  register: var_mysql_mesos_dns_response
+  until: var_mysql_mesos_dns_response.json.0.ip != ""
   retries: 10
   delay: 10
 - name: Check that MySQL is accepting connections
@@ -52,8 +52,8 @@
     login_user=root
     login_password={{mysql_root_password}}
     variable=version
-  register: result
-  until: result|success
+  register: var_mysql_version_check
+  until: var_mysql_version_check|success
   retries: 6
   delay: 10 
 - name: Get MySQL host IP from Mesos-DNS

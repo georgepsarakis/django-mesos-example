@@ -3,6 +3,7 @@
   apt: name="{{item}}" state=present update_cache=yes
   with_items:
     - mesos
+  register: var_mesos_installed
 - name: "Configure containerizers"
   lineinfile: line="docker,mesos" dest=/etc/mesos-slave/containerizers state=present create=yes
 - name: "Configure networking (IP)"
@@ -23,8 +24,10 @@
     - /etc/mesos-slave/hostname
 - name: "Configure Zookeeper"
   shell: "echo 'zk://localhost:2181/mesos' > /etc/mesos/zk"
-- name: Restart Zookeeper and Mesos
-  service: name="{{item}}" state=restarted
+- name: Restart/reload Zookeeper and Mesos
+  service: >
+    name="{{item}}" 
+    state="{% if var_mesos_installed|skipped %}reloaded{% else %}restarted{% endif %}"
   with_items:
     - zookeeper
     - mesos-master

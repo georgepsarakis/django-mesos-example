@@ -4,10 +4,10 @@
 - name: Get Vagrant status
   shell: >
     vagrant status | grep "{{vagrant_vm_name}}" || true
-  register: cmd_output
-- debug: msg="{{cmd_output.stdout}}"
+  register: var_vagrant_status
+- debug: msg="{{var_vagrant_status.stdout}}"
 - set_fact:
-    vagrant_vm_status: "{{cmd_output.stdout|vagrant_status}}"
+    vagrant_vm_status: "{{var_vagrant_status.stdout|vagrant_status}}"
 - name: Create log directory
   file: path="{{log_path|dirname}}" state=directory
 - name: Cleanup logs

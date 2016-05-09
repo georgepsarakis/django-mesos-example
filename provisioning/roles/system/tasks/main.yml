@@ -23,9 +23,9 @@
     - "docker-py"
 - name: "Get kernel version"
   shell: uname -r
-  register: uname_r
-- name: "Install linux-image-extra-{{uname_r.stdout}}"
-  apt: name="linux-image-extra-{{uname_r.stdout}}" state=present
+  register: var_kernel_version
+- name: "Install linux-image-extra-{{kernel_version.stdout}}"
+  apt: name="linux-image-extra-{{kernel_version.stdout}}" state=present
 - name: "Install Docker - add apt key"
   apt_key: >
     keyserver=p80.pool.sks-keyservers.net 

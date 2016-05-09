@@ -37,9 +37,10 @@
   args:
     chdir: /marathon-lb
     creates: /usr/local/sbin/haproxy
+  register: var_haproxy_build
 - name: Check if SSL certificate exists
   stat: path=/etc/ssl/mesosphere.com.pem
-  register: stat_marathon_lb_ssl_certificate
+  register: var_stat_marathon_lb_ssl_certificate
 - name: Generate SSL certificate
   shell: "{{item}}"
   with_items:
@@ -48,12 +49,12 @@
     - 'openssl x509 -req -in /tmp/server-csr.pem -out /tmp/server-cert.pem -signkey /tmp/server-key.pem -days 3650'
     - 'cat /tmp/server-cert.pem /tmp/server-key.pem > /etc/ssl/mesosphere.com.pem'
     - 'rm /tmp/server-*.pem'
-  when: not stat_marathon_lb_ssl_certificate.stat.exists
+  when: not var_stat_marathon_lb_ssl_certificate.stat.exists
 - name: Add HAproxy default variables
   template: src=./etc.default.haproxy.j2 dest=/etc/default/haproxy backup=yes
-- name: Restart HAproxy
-  service: name="{{item}}" state=restarted
-  with_items:
-    - haproxy
+- name: Restart/reload HAproxy
+  service: >
+    name=haproxy 
+    state="{% if var_haproxy_build|skipped %}reloaded{% else %}restarted{% endif %}"
   ignore_errors: true
 
