@@ -24,8 +24,8 @@
 - name: "Get kernel version"
   shell: uname -r
   register: var_kernel_version
-- name: "Install linux-image-extra-{{kernel_version.stdout}}"
-  apt: name="linux-image-extra-{{kernel_version.stdout}}" state=present
+- name: "Install linux-image-extra-{{var_kernel_version.stdout}}"
+  apt: name="linux-image-extra-{{var_kernel_version.stdout}}" state=present
 - name: "Install Docker - add apt key"
   apt_key: >
     keyserver=p80.pool.sks-keyservers.net 
