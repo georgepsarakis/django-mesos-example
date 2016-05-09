@@ -6,17 +6,6 @@ before_install:
 install:
   - sudo apt-get install -y libffi-dev build-essential python-dev
   - sudo pip install ansible
-  - sudo ifconfig
 script:
-  - sudo cat /etc/hosts && sudo cat /etc/hostname
-  - sudo hostname
   - sudo ln -s `pwd`/project /vagrant
-  - sudo -E ansible-playbook -vvv -i localhost, -c local -e "system_skip_full_upgrade=yes system_skip_network_configuration=no" provisioning/deployment.yml || true
-  - sudo cat /etc/hosts && sudo cat /etc/hostname
-  - sudo hostname
-  - sudo netstat -tulpane
-  - sudo ps uxa
-  - cat /var/log/mesos/*
-  - sudo cat /etc/nsswitch.conf
-  - sudo cat /etc/resolv.conf
-  - sudo cat /etc/network/interfaces
+  - ansible-playbook -vvvv --become -i localhost, -c local -e "system_skip_full_upgrade=yes" provisioning/deployment.yml
