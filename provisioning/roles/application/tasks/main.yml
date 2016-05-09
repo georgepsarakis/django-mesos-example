@@ -8,10 +8,11 @@
   ignore_errors: true
   with_file: marathon_task_files
 - name: Build application Docker image
-  docker_image: path=/vagrant name=local_templater state=present tag=alpha
-- name: Stop all running containers
-  shell: docker rm -f $(docker ps -aq)
-  ignore_errors: true
+  docker_image: >
+    path=/vagrant 
+    name=django_mesos_example_application
+    state=present
+    tag={{application_docker_image_version_tag}}
 - name: Retrieve Marathon apps
   uri:
     url: "{{ marathon_api_base_url ~ '/apps' }}"
@@ -19,16 +20,16 @@
   register: marathon_current_app_list_response
 - set_fact:
     marathon_installed_apps: "{{ marathon_current_app_list_response.json.apps|map(attribute='id')|list }}"
-- name: Submit Marathon tasks (1/2)
+- name: Submit Marathon tasks (Mesos-DNS, Marathon-lb, MySQL)
   uri: 
     url: "{{marathon_api_base_url ~ '/apps/?force=true'}}"
     method: POST
     HEADER_Content-type: "application/json"
-    body: "{{item}}"
+    body: "{{lookup('template', item, convert_data=False)}}"
     body_format: json
     status_code: 200,201
-  with_file: "{{marathon_task_files[:3]}}"
-  when: "{{'/' ~ ((item|from_json).id) not in marathon_installed_apps}}"
+  with_items: "{{marathon_task_files[:3]}}"
+  when: "{{'/' ~ ((lookup('template', item, convert_data=False)|from_json).id) not in marathon_installed_apps}}"
 - name: Wait for ports to become available (HAProxy, Mesos-DNS, Mysql)
   wait_for: >
     port={{item}}
@@ -49,7 +50,7 @@
   mysql_variables: >
     login_host={{ansible_default_ipv4.address}}
     login_user=root
-    login_password=test
+    login_password={{mysql_root_password}}
     variable=version
   register: result
   until: result|success
@@ -62,23 +63,23 @@
 - name: "[Django] DB migrate & Collect static files"
   docker:
     detach: false
-    image: 'local_templater:alpha'
+    image: 'django_mesos_example_application:{{application_docker_image_version_tag}}'
     command: '/usr/bin/python manage.py {{item}} --no-input'
     volumes:
       - '/vagrant:/app/web'
   with_items:
     - collectstatic
     - migrate
-- name: Submit Marathon tasks (2/2)
+- name: "Submit Marathon tasks (Application & Nginx)"
   uri: 
     url: "{{marathon_api_base_url ~ '/apps/?force=true'}}"
     method: POST
     HEADER_Content-type: "application/json"
-    body: "{{item}}"
+    body: "{{lookup('template', item, convert_data=False)}}"
     body_format: json
     status_code: 200,201
-  with_file: "{{marathon_task_files[3:]}}"
-  when: "{{'/' ~ ((item|from_json).id) not in marathon_installed_apps}}"
+  with_items: "{{marathon_task_files[3:]}}"
+  when: "{{'/' ~ ((lookup('template', item, convert_data=False)|from_json).id) not in marathon_installed_apps}}"
 - name: Wait for ports to become available (Nginx)
   wait_for: >
     port={{item}}

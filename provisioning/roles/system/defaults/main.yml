@@ -1,1 +1,2 @@
 system_skip_full_upgrade: false
+system_skip_network_configuration: false

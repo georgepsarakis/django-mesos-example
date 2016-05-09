@@ -1,15 +1,9 @@
 ---
-- name: Check if HAProxy has been installed
-  stat: path=/etc/init.d/haproxy
-  register: haproxy_initd_file
-- name: Stop HAproxy to free allocated ports
-  service: name="{{item}}" state=stopped
-  with_items:
-    - haproxy
-  when: haproxy_initd_file.stat.exists
-- name: Marathon-lb - fetch Github repository
+- name: Fetch Github repository
   git: repo=https://github.com/mesosphere/marathon-lb.git dest=/marathon-lb
-- name: Marathon-lb - Install HAproxy build requirements
+- name: Set source directory permissions
+  file: path=/marathon-lb state=directory mode=0755
+- name: Install HAproxy build requirements
   apt: name={{item}} state=present update_cache=yes
   with_items:
     - python3 
@@ -26,7 +20,7 @@
     - socat 
     - iptables 
     - libreadline-dev
-- name: Marathon-lb - Create HAproxy directories
+- name: Create HAproxy directories
   file: >
     path={{item}}
     state=directory
@@ -34,24 +28,28 @@
   with_items:
     - '/var/state/haproxy'
     - '/var/run/haproxy'
-- name: Marathon-lb - Install Python requirements
+- name: Install Python requirements
   pip: executable=pip3 requirements=/marathon-lb/requirements.txt
-- name: Marathon-lb - Install HAproxy
+- name: Install HAproxy
   apt: name=haproxy state=latest
-- name: Marathon-lb - Build latest HAproxy (1.6+)
+- name: Build latest HAproxy (1.6+)
   shell: ./build-haproxy.sh
   args:
     chdir: /marathon-lb
     creates: /usr/local/sbin/haproxy
-- name: Marathon-lb - Generate SSL certificate
-  shell: '{{item}}'
+- name: Check if SSL certificate exists
+  stat: path=/etc/ssl/mesosphere.com.pem
+  register: stat_marathon_lb_ssl_certificate
+- name: Generate SSL certificate
+  shell: "{{item}}"
   with_items:
     - 'openssl genrsa -out /tmp/server-key.pem 2048'
     - 'openssl req -new -key /tmp/server-key.pem -out /tmp/server-csr.pem -subj /CN=*/'
     - 'openssl x509 -req -in /tmp/server-csr.pem -out /tmp/server-cert.pem -signkey /tmp/server-key.pem -days 3650'
     - 'cat /tmp/server-cert.pem /tmp/server-key.pem > /etc/ssl/mesosphere.com.pem'
     - 'rm /tmp/server-*.pem'
-- name: Marathon-lb - Add HAproxy default variables
+  when: not stat_marathon_lb_ssl_certificate.stat.exists
+- name: Add HAproxy default variables
   template: src=./etc.default.haproxy.j2 dest=/etc/default/haproxy backup=yes
 - name: Restart HAproxy
   service: name="{{item}}" state=restarted

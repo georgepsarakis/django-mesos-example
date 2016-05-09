@@ -29,11 +29,12 @@
     - zookeeper
     - mesos-master
     - mesos-slave
-- wait_for: >
+- name: Waiting for ports to become available (Zookeeper, Mesos)
+  wait_for: >
     port={{item}}
     host={{ansible_default_ipv4.address}}
     delay=2
   with_items:
-    - 5050
     - 2181
+    - 5050
 

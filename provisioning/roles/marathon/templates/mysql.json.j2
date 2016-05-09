@@ -8,10 +8,10 @@
     "docker": {
       "image": "mysql:5.7",
       "parameters": [
-          {"key": "env", "value": "MYSQL_ROOT_PASSWORD=test"},
-          {"key": "env", "value": "MYSQL_USER=template_api"},
-          {"key": "env", "value": "MYSQL_PASSWORD=template_api_test"},
-          {"key": "env", "value": "MYSQL_DATABASE=template_api"}
+          {"key": "env", "value": "MYSQL_ROOT_PASSWORD={{mysql_root_password}}"},
+          {"key": "env", "value": "MYSQL_USER={{mysql_app_user}}"},
+          {"key": "env", "value": "MYSQL_PASSWORD={{mysql_app_password}}"},
+          {"key": "env", "value": "MYSQL_DATABASE={{mysql_app_database}}"}
       ],
       "network": "BRIDGE",
       "portMappings": [

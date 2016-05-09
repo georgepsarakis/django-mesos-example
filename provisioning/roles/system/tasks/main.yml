@@ -7,7 +7,7 @@
     - "{{ansible_default_ipv4.address}}    {{ansible_fqdn}}    {{ansible_hostname}}"
   when: not (system_skip_network_configuration|bool)
 - name: Install additional APT packages
-  apt: name={{item}} state=present 
+  apt: name={{item}} state=present update_cache=yes
   with_items:
     - apt-transport-https 
     - ca-certificates
@@ -37,8 +37,6 @@
     update_cache=yes
 - name: "Install Docker - install docker-engine"
   apt: name=docker-engine state=latest
-  notify:
-    - restart-docker
 - name: "Accept Java 8 License"
   debconf: >
     name='oracle-java8-installer' 

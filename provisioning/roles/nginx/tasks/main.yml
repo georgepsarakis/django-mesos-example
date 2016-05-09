@@ -1,8 +1,11 @@
 ---
 - set_fact:
     path_tmp_build_nginx: /tmp/build-nginx.docker/
-- name: Create temporary build directory
-  file: "path={{path_tmp_build_nginx}} state=directory"
+- name: Recreate temporary build directory
+  file: "path={{path_tmp_build_nginx}} state={{item}}"
+  with_items:
+    - absent
+    - directory
 - name: Render configuration file templates
   template: src=./django.conf.j2 dest="{{path_tmp_build_nginx|os_path_join('django.conf')}}"
 - name: Copy Dockerfile
@@ -10,9 +13,8 @@
 - name: Build Nginx Docker image
   docker_image: >
     path={{path_tmp_build_nginx}} 
-    name=local_nginx 
+    name=django_mesos_example_nginx 
     state=present 
-    tag=alpha
+    tag={{nginx_docker_image_version_tag}}
 - name: Remove temporary build directory
   file: "path={{path_tmp_build_nginx}} state=absent"
-

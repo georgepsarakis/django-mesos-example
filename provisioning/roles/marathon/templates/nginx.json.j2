@@ -6,7 +6,7 @@
   "container": {
     "type": "DOCKER",
     "docker": {
-      "image": "local_nginx:alpha",
+      "image": "django_mesos_example_nginx:{{nginx_docker_image_version_tag}}",
       "network": "BRIDGE",
       "portMappings": [
           {"containerPort": 7070, "hostPort": 0, "servicePort": 7070, "protocol": "tcp" }

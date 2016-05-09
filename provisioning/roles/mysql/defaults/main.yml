@@ -1,0 +1,4 @@
+mysql_root_password: test
+mysql_app_user: template_api_user
+mysql_app_password: template_api_passwd
+mysql_app_database: template_api

@@ -87,8 +87,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'template_api',
-        'USER': 'template_api',
-        'PASSWORD': 'template_api_test',
+        'USER': 'template_api_user',
+        'PASSWORD': 'template_api_passwd',
         'HOST': MYSQL_HOST,
         'PORT': '3306',
     }

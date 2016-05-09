@@ -1,8 +1,9 @@
+application_docker_image_version_tag: "1.0"
 marathon_api_base_url: "http://localhost:8080/v2"
 marathon_task_files:
   - "files/mesos-dns.json"
-  - "files/mysql.json"
+  - "templates/mysql.json.j2"
   - "files/marathon-lb.json"
-  - "files/application.json"
-  - "files/nginx.json"
+  - "templates/application.json.j2"
+  - "templates/nginx.json.j2"
 

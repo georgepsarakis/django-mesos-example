@@ -1,12 +1,12 @@
 {
-  "id": "templater",
+  "id": "template-api",
   "cpus": 0.1,
   "mem": 64,
   "instances": 2,
   "container": {
     "type": "DOCKER",
     "docker": {
-      "image": "local_templater:alpha",
+      "image": "django_mesos_example_application:{{application_docker_image_version_tag}}",
       "network": "BRIDGE",
       "portMappings": [
           {"containerPort": 45000, "hostPort": 0, "servicePort": 45000, "protocol": "tcp" }
